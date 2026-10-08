@@ -2,11 +2,11 @@
 import PackageDescription
 
 let package = Package(
-    name: "DillyCapacitorPassToWallet",
+    name: "OrdernowCapacitorPassToWallet",
     platforms: [.iOS(.v13)],
     products: [
         .library(
-            name: "DillyCapacitorPassToWallet",
+            name: "OrdernowCapacitorPassToWallet",
             targets: ["PassToWalletPlugin"])
     ],
     dependencies: [
