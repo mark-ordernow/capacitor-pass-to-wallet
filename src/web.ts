@@ -1,10 +1,15 @@
 import { WebPlugin } from '@capacitor/core';
 
-import type { PassToWalletPlugin } from './definitions';
+/**
+ * No Wallet on the web: availability checks say no. Every other method is
+ * missing here, so Capacitor rejects it as "not implemented on web".
+ */
+export class PassToWalletWeb extends WebPlugin {
+  async canAddPasses(): Promise<{ canAdd: boolean }> {
+    return { canAdd: false };
+  }
 
-export class PassToWalletWeb extends WebPlugin implements PassToWalletPlugin {
-  async echo(options: { value: string }): Promise<{ value: string }> {
-    console.log('ECHO', options);
-    return options;
+  async isAvailable(): Promise<{ available: boolean }> {
+    return { available: false };
   }
 }
