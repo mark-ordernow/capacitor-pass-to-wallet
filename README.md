@@ -49,7 +49,7 @@ import '@minhvdv/capacitor-pass-to-wallet'; // registers <pass-to-wallet-button>
 - **Android**: Google's official "Add to / View in Google Wallet" artwork in the page language: the nearest `lang` attribute (on the element or `<html>`, so apps with their own language setting just keep `<html lang>` current), then the device language (`navigator.languages`), then English. Only the chosen language is downloaded.
 - iOS draws `PKAddPassButton` in the app's iOS language (device or per-app language in iOS Settings, limited to `CFBundleLocalizations`); Apple offers no way to set it from the web page.
 - **Web**: renders nothing.
-- Height: CSS `--pass-to-wallet-height` (default `48px`); width follows the artwork. On iOS the add button fills any `::part(button)` width you set (`!important`); the icon and text scale with the height, extra width becomes padding.
+- Height: CSS `--pass-to-wallet-height` (default `48px`); width follows the artwork. The iOS add button is the exception: iOS picks its size and layout, it is never scaled or stretched.
 
 ### Customizing the Apple "view" button
 
@@ -183,8 +183,8 @@ iOS only. Intrinsic size of `PKAddPassButton`, for the web placeholder.
 showAddButton(frame: AddButtonFrame) => Promise<void>
 ```
 
-iOS only. Draws the official `PKAddPassButton` over the web view at
-`frame`; taps arrive as `addButtonTap` events.
+iOS only. Draws the official `PKAddPassButton` at its system size,
+centered on `frame`; taps arrive as `addButtonTap` events.
 
 | Param       | Type                                                      |
 | ----------- | --------------------------------------------------------- |

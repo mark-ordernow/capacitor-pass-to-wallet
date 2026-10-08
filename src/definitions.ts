@@ -40,8 +40,8 @@ export interface PassToWalletPlugin {
   addButtonSize(): Promise<AddButtonSize>;
 
   /**
-   * iOS only. Draws the official `PKAddPassButton` over the web view at
-   * `frame`; taps arrive as `addButtonTap` events.
+   * iOS only. Draws the official `PKAddPassButton` at its system size,
+   * centered on `frame`; taps arrive as `addButtonTap` events.
    */
   showAddButton(frame: AddButtonFrame): Promise<void>;
 

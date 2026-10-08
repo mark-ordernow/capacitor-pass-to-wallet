@@ -86,8 +86,7 @@ public class PassToWalletPlugin: CAPPlugin, CAPBridgedPlugin, PKAddPassesViewCon
         }
     }
 
-    /// The system decides the proportions (localized two-line badge); the web placeholder mirrors them.
-    /// A larger frame only adds padding, a wider one switches to the one-line layout.
+    /// The system's localized size; the web placeholder reserves exactly this.
     @objc func addButtonSize(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             let size = PKAddPassButton(addPassButtonStyle: .black).intrinsicContentSize
@@ -96,8 +95,8 @@ public class PassToWalletPlugin: CAPPlugin, CAPBridgedPlugin, PKAddPassesViewCon
     }
 
     /// Frame is CSS px from getBoundingClientRect, which equals points relative to the web view.
-    /// The system draws its artwork at a fixed 40pt height whatever the frame, so the button is
-    /// scaled by the frame height (icon and text grow with it); extra width is drawn as padding.
+    /// The button keeps the size iOS picks (scaling or stretching it distorts the artwork),
+    /// centered on the frame.
     @objc func showAddButton(_ call: CAPPluginCall) {
         let frame = CGRect(
             x: call.getDouble("x") ?? 0,
@@ -111,14 +110,8 @@ public class PassToWalletPlugin: CAPPlugin, CAPBridgedPlugin, PKAddPassesViewCon
                 return
             }
             let button = self.addButton ?? self.makeAddButton(in: webView)
-            let natural = button.intrinsicContentSize
-            let scale = frame.height / natural.height
-            button.transform = .identity
-            button.bounds = CGRect(x: 0, y: 0, width: frame.width / scale, height: natural.height)
-            button.transform = CGAffineTransform(scaleX: scale, y: scale)
+            button.bounds = CGRect(origin: .zero, size: button.intrinsicContentSize)
             button.center = CGPoint(x: frame.midX, y: frame.midY)
-            // Re-render text at the scaled resolution instead of stretching a bitmap.
-            self.setContentScale(button, (webView.window?.screen.scale ?? 3) * scale)
             button.isHidden = false
             call.resolve()
         }
@@ -129,11 +122,6 @@ public class PassToWalletPlugin: CAPPlugin, CAPBridgedPlugin, PKAddPassesViewCon
             self.addButton?.isHidden = true
             call.resolve()
         }
-    }
-
-    private func setContentScale(_ view: UIView, _ scale: CGFloat) {
-        view.contentScaleFactor = scale
-        view.subviews.forEach { setContentScale($0, scale) }
     }
 
     private func makeAddButton(in webView: UIView) -> PKAddPassButton {

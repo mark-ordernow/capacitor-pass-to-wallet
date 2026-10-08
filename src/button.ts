@@ -12,7 +12,8 @@ const STYLE = `<style>
   :host([hidden]) { display: none; }
   button { all: unset; cursor: pointer; display: block; }
   button:focus-visible { outline: 2px solid; outline-offset: 2px; }
-  img, .apple-add { display: block; height: var(--pass-to-wallet-height, 48px); }
+  img { display: block; height: var(--pass-to-wallet-height, 48px); }
+  .apple-add { display: block; }
   /* Apple has no official "view" control; the HIG suggests a link labelled
      like "View in Wallet". Restyle with ::part(button) or the variables. */
   .apple-view {
@@ -108,10 +109,10 @@ export class PassToWalletButton extends Base {
         this.root.innerHTML = '';
         return;
       }
-      // Width follows the native button's localized proportions; the native
-      // button itself is what VoiceOver and taps reach.
+      // iOS decides the size (localized, unscaled): the placeholder only reserves
+      // it. The native button itself is what VoiceOver and taps reach.
       this.root.innerHTML = `${STYLE}<div part="button" class="apple-add"
-        style="width: calc(var(--pass-to-wallet-height, 48px) * ${size.width / size.height})"></div>`;
+        style="width: ${size.width}px; height: ${size.height}px"></div>`;
       if (!appleTapListening) {
         appleTapListening = true;
         void PassToWallet.addListener('addButtonTap', () => appleOwner?.emit());
