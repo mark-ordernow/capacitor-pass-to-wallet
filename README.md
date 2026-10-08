@@ -45,10 +45,37 @@ import '@minhvdv/capacitor-pass-to-wallet'; // registers <pass-to-wallet-button>
 | `mode` | `add` · `view` (already added) | `add` |
 | `variant` | `button` · `badge` (Google artwork style) | `button` |
 
-- **iOS**: `mode="add"` is the official `PKAddPassButton`, drawn natively over the element and kept in place while the page scrolls or animates (hidden when anything covers it). `mode="view"` is a plain button showing the slotted label (Apple has no official one).
+- **iOS**: `mode="add"` is the official `PKAddPassButton`, drawn natively over the element and kept in place while the page scrolls or animates (hidden when anything covers it). `mode="view"` is yours to design (see below): Apple has no official control and only suggests a link labelled like "View in Wallet".
 - **Android**: Google's official "Add to / View in Google Wallet" artwork in the device language (falls back through `navigator.languages`, then English). Only the chosen language is downloaded.
 - **Web**: renders nothing.
 - Height: CSS `--pass-to-wallet-height` (default `48px`); width follows the artwork.
+
+### Customizing the Apple "view" button
+
+Official artwork (`PKAddPassButton`, Google's badges) must not be altered, so only the iOS `mode="view"` button is customizable. By default it is a link-style "View in Wallet" in the surrounding font (inherited from the parent).
+
+```html
+<!-- Content: any HTML, e.g. your translated label and an icon -->
+<pass-to-wallet-button mode="view">
+  <img src="wallet.svg" alt="" /> Xem trong Wallet
+</pass-to-wallet-button>
+```
+
+```css
+/* Quick tweaks */
+pass-to-wallet-button {
+  --pass-to-wallet-color: #000;
+  --pass-to-wallet-font: 600 15px system-ui;
+}
+
+/* Full control */
+pass-to-wallet-button::part(button) {
+  background: #000;
+  color: #fff;
+  border-radius: 12px;
+  padding: 0 20px;
+}
+```
 - Taps fire `walletclick`. Issuing the pass and calling `addPass` / `savePassesJwt` stays with the app.
 
 Angular: add `CUSTOM_ELEMENTS_SCHEMA` to the component, then `(walletclick)="add()"`.
@@ -263,3 +290,7 @@ CSS px from `getBoundingClientRect()` (= points relative to the web view).
 | **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
 
 </docgen-api>
+
+## Support
+
+If this plugin saves you time, you can support its development via [PayPal](https://paypal.me/MinhVDV).

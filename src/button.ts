@@ -13,13 +13,14 @@ const STYLE = `<style>
   button { all: unset; cursor: pointer; display: block; }
   button:focus-visible { outline: 2px solid; outline-offset: 2px; }
   img, .apple-add { display: block; height: var(--pass-to-wallet-height, 48px); }
+  /* Apple has no official "view" control; the HIG suggests a link labelled
+     like "View in Wallet". Restyle with ::part(button) or the variables. */
   .apple-view {
     height: var(--pass-to-wallet-height, 48px);
-    padding: 0 16px;
-    border-radius: 8px;
-    background: #000;
-    color: #fff;
-    font: 500 15px/var(--pass-to-wallet-height, 48px) -apple-system, system-ui, sans-serif;
+    color: var(--pass-to-wallet-color, #007aff);
+    /* Inherits the surrounding font unless --pass-to-wallet-font is set. */
+    font: var(--pass-to-wallet-font, inherit);
+    line-height: var(--pass-to-wallet-height, 48px);
   }
 </style>`;
 
@@ -47,8 +48,8 @@ const Base = (typeof HTMLElement === 'undefined' ? class {} : HTMLElement) as ty
  * `<pass-to-wallet-button mode="add|view" variant="button|badge">`
  *
  * iOS: the official PKAddPassButton drawn natively over this element (Apple
- * requires it in apps); `mode="view"` renders a plain button with the slotted
- * label. Android: Google's official artwork in the device language;
+ * requires it in apps); `mode="view"` renders a link-style button with the
+ * slotted content (default "View in Wallet"), restylable via ::part(button). Android: Google's official artwork in the device language;
  * `variant` picks the button or the badge. Web: renders nothing.
  * Taps fire a `walletclick` event; issuing and saving the pass stays with the app.
  */
@@ -106,7 +107,7 @@ export class PassToWalletButton extends Base {
       }
       this.startTracking();
     } else if (platform === 'ios') {
-      this.root.innerHTML = `${STYLE}<button part="button" class="apple-view"><slot>Open in Apple Wallet</slot></button>`;
+      this.root.innerHTML = `${STYLE}<button part="button" class="apple-view"><slot>View in Wallet</slot></button>`;
     } else if (platform === 'android') {
       const badges = GOOGLE_BADGES[this.mode];
       const svg = (await badges[googleBadgeKey(Object.keys(badges), navigator.languages ?? [navigator.language])]())[
