@@ -1,4 +1,4 @@
-package app.dilly.plugins.passtowallet;
+package com.minhvdv.plugins.passtowallet;
 
 import android.app.Activity;
 import android.content.Intent;

@@ -56,7 +56,7 @@ for (const [mode, { dir, suffix }] of Object.entries(SOURCES)) {
     if (!button || !badge) throw new Error(`${mode}/${key}: missing button or badge SVG`);
     writeFileSync(
       `${OUT}/google/${mode}-${key}.ts`,
-      `export const button = ${JSON.stringify(button)};\nexport const badge = ${JSON.stringify(badge)};\n`,
+      `export const button: string = ${JSON.stringify(button)};\nexport const badge: string = ${JSON.stringify(badge)};\n`,
     );
   }
 }

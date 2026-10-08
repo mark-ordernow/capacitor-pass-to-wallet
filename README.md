@@ -1,4 +1,4 @@
-# @dilly/capacitor-pass-to-wallet
+# @minhvdv/capacitor-pass-to-wallet
 
 Add passes to Apple Wallet (PassKit) and Google Wallet (Google Pay API) from Capacitor apps
 
@@ -15,11 +15,10 @@ One source for all three (`peerDependencies: @capacitor/core >=6 <9`). Built and
 ## Install
 
 ```bash
-npm install github:Channel-Platform-Service/pass-to-wallet   # or file:../pass-to-wallet
+npm install @minhvdv/capacitor-pass-to-wallet
 npx cap sync
 ```
 
-`prepare` builds the package on install (Google artwork is generated from `src/assets`).
 
 ### iOS
 
@@ -33,7 +32,7 @@ Nothing to configure: `com.google.android.gms:play-services-pay` comes with the 
 ## Wallet button
 
 ```ts
-import '@dilly/capacitor-pass-to-wallet'; // registers <pass-to-wallet-button>
+import '@minhvdv/capacitor-pass-to-wallet'; // registers <pass-to-wallet-button>
 ```
 
 ```html

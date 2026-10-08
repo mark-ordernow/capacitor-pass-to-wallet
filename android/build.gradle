@@ -19,7 +19,7 @@ buildscript {
 apply plugin: 'com.android.library'
 
 android {
-    namespace = "app.dilly.plugins.passtowallet"
+    namespace = "com.minhvdv.plugins.passtowallet"
     compileSdk = project.hasProperty('compileSdkVersion') ? rootProject.ext.compileSdkVersion : 36
     defaultConfig {
         minSdkVersion project.hasProperty('minSdkVersion') ? rootProject.ext.minSdkVersion : 24
