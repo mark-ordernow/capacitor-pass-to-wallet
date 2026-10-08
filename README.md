@@ -46,7 +46,8 @@ import '@minhvdv/capacitor-pass-to-wallet'; // registers <pass-to-wallet-button>
 | `variant` | `button` · `badge` (Google artwork style) | `button` |
 
 - **iOS**: `mode="add"` is the official `PKAddPassButton`, drawn natively over the element and kept in place while the page scrolls or animates (hidden when anything covers it). `mode="view"` is yours to design (see below): Apple has no official control and only suggests a link labelled like "View in Wallet".
-- **Android**: Google's official "Add to / View in Google Wallet" artwork in the device language (falls back through `navigator.languages`, then English). Only the chosen language is downloaded.
+- **Android**: Google's official "Add to / View in Google Wallet" artwork in the page language: the nearest `lang` attribute (on the element or `<html>`, so apps with their own language setting just keep `<html lang>` current), then the device language (`navigator.languages`), then English. Only the chosen language is downloaded.
+- iOS draws `PKAddPassButton` in the app's iOS language (device or per-app language in iOS Settings, limited to `CFBundleLocalizations`); Apple offers no way to set it from the web page.
 - **Web**: renders nothing.
 - Height: CSS `--pass-to-wallet-height` (default `48px`); width follows the artwork.
 

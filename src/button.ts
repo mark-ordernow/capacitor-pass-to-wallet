@@ -49,8 +49,10 @@ const Base = (typeof HTMLElement === 'undefined' ? class {} : HTMLElement) as ty
  *
  * iOS: the official PKAddPassButton drawn natively over this element (Apple
  * requires it in apps); `mode="view"` renders a link-style button with the
- * slotted content (default "View in Wallet"), restylable via ::part(button). Android: Google's official artwork in the device language;
- * `variant` picks the button or the badge. Web: renders nothing.
+ * slotted content (default "View in Wallet"), restylable via ::part(button).
+ * Android: Google's official artwork in the page language (nearest `lang`),
+ * else the device language; `variant` picks the button or the badge.
+ * Web: renders nothing.
  * Taps fire a `walletclick` event; issuing and saving the pass stays with the app.
  */
 export class PassToWalletButton extends Base {
@@ -82,6 +84,15 @@ export class PassToWalletButton extends Base {
     if (this.isConnected) void this.render();
   }
 
+  /**
+   * The page's language first (nearest `lang`, as HTML defines it: apps with
+   * their own language setting set it on <html>), then the device's.
+   */
+  private languages(): string[] {
+    const lang = this.closest('[lang]')?.getAttribute('lang');
+    return [...(lang ? [lang] : []), ...(navigator.languages ?? [navigator.language])];
+  }
+
   private readonly emit = (): void => {
     this.dispatchEvent(new CustomEvent('walletclick', { bubbles: true, composed: true }));
   };
@@ -110,9 +121,7 @@ export class PassToWalletButton extends Base {
       this.root.innerHTML = `${STYLE}<button part="button" class="apple-view"><slot>View in Wallet</slot></button>`;
     } else if (platform === 'android') {
       const badges = GOOGLE_BADGES[this.mode];
-      const svg = (await badges[googleBadgeKey(Object.keys(badges), navigator.languages ?? [navigator.language])]())[
-        this.variant
-      ];
+      const svg = (await badges[googleBadgeKey(Object.keys(badges), this.languages())]())[this.variant];
       if (id !== this.renderId) return;
       // encodeURIComponent leaves no quotes, so the data URL is safe in the attribute.
       this.root.innerHTML = `${STYLE}<button part="button"><img src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(
