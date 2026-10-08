@@ -2,11 +2,11 @@
 import PackageDescription
 
 let package = Package(
-    name: "MinhvdvCapacitorPassToWallet",
+    name: "DillyCapacitorPassToWallet",
     platforms: [.iOS(.v13)],
     products: [
         .library(
-            name: "MinhvdvCapacitorPassToWallet",
+            name: "DillyCapacitorPassToWallet",
             targets: ["PassToWalletPlugin"])
     ],
     dependencies: [
