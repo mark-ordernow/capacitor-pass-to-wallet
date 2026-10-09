@@ -2,6 +2,18 @@
 
 Add passes to Apple Wallet (PassKit) and Google Wallet (Google Pay API) from Capacitor apps
 
+## Why this plugin
+
+- **One package, both wallets.** Apple Wallet on iOS, Google Wallet on Android, one API, one install, for Capacitor 6, 7 and 8.
+- **Official buttons, ready to use.** Drop `<pass-to-wallet-button>` into any page (Angular, React, Vue or plain HTML) and listen for `walletclick`:
+  - **iOS**: the real `PKAddPassButton` as Apple requires in apps, drawn natively over the web view. It follows the element while the page scrolls, animates or opens a modal, and hides when something covers it.
+  - **Android**: Google's official "Add to / View in Google Wallet" artwork in 70+ languages, matched to your page or device language. Only the language in use is downloaded.
+- **Sized your way, never distorted.** Pick the one-line or two-line Apple button, set a width and height, and the button scales as a whole with Apple's proportions kept.
+- **A "View in Wallet" button too.** Apple has no official control for passes already added; the plugin gives you one you can restyle with CSS and your own label.
+- **A predictable add flow.** `addPass` resolves only after the add sheet closes, and `passExists` tells you whether the pass actually landed in Wallet, so your app (or server) never records a pass the user cancelled.
+- **Your backend stays yours.** The plugin never signs or stores passes: issue the `.pkpass` (Apple) or the save JWT (Google) from any server you like.
+- **No extra dependencies.** Only `@capacitor/core` as a peer dependency.
+
 ## Compatibility
 
 | Capacitor | iOS | Android |

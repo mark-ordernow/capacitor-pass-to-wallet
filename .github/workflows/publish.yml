@@ -1,0 +1,41 @@
+name: publish
+
+on:
+  push:
+    branches: [main]
+
+concurrency: publish
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - run: npm test
+      - id: bump
+        run: |
+          echo "prev=$(node -p 'require("./package.json").version')" >> "$GITHUB_OUTPUT"
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          npm version patch -m "chore(release): %s [skip ci]"
+          echo "next=$(node -p 'require("./package.json").version')" >> "$GITHUB_OUTPUT"
+      - run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Deprecate previous version
+        run: npm deprecate "$PKG@$PREV" "Superseded by $PKG@$NEXT"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          PKG: '@ordernow/capacitor-pass-to-wallet'
+          PREV: ${{ steps.bump.outputs.prev }}
+          NEXT: ${{ steps.bump.outputs.next }}
+      - run: git push --follow-tags
