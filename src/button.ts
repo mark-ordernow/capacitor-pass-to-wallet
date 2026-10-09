@@ -46,18 +46,20 @@ const appleSizes: Partial<Record<AddButtonLayout, Promise<AddButtonSize>>> = {};
 const Base = (typeof HTMLElement === 'undefined' ? class {} : HTMLElement) as typeof HTMLElement;
 
 /**
- * `<pass-to-wallet-button mode="add|view" variant="button|badge" layout="one-line|two-line">`
+ * `<pass-to-wallet-button mode="add|view" variant="button|badge">`
  *
+ * `variant`: `button` = iOS one-line / Google button, `badge` = iOS two-line /
+ * Google badge.
  * iOS: the official PKAddPassButton drawn natively over this element (Apple
  * requires it in apps); `mode="view"` renders a link-style button with the
  * slotted content (default "View in Wallet"), restylable via ::part(button).
  * Android: Google's official artwork in the page language (nearest `lang`),
- * else the device language; `variant` picks the button or the badge.
+ * else the device language.
  * Web: renders nothing.
  * Taps fire a `walletclick` event; issuing and saving the pass stays with the app.
  */
 export class PassToWalletButton extends Base {
-  static observedAttributes = ['mode', 'variant', 'layout'];
+  static observedAttributes = ['mode', 'variant'];
 
   private readonly root = this.attachShadow({ mode: 'open' });
   private renderId = 0;
@@ -72,9 +74,8 @@ export class PassToWalletButton extends Base {
     return this.getAttribute('variant') === 'badge' ? 'badge' : 'button';
   }
 
-  /** iOS add button only. */
-  get layout(): AddButtonLayout {
-    return this.getAttribute('layout') === 'two-line' ? 'two-line' : 'one-line';
+  private get appleLayout(): AddButtonLayout {
+    return this.variant === 'badge' ? 'two-line' : 'one-line';
   }
 
   connectedCallback(): void {
@@ -108,7 +109,7 @@ export class PassToWalletButton extends Base {
     this.stopTracking();
     const platform = Capacitor.getPlatform();
     if (platform === 'ios' && this.mode === 'add') {
-      const layout = this.layout;
+      const layout = this.appleLayout;
       const size = await (appleSizes[layout] ??= PassToWallet.addButtonSize({ layout })).catch(() => null);
       if (id !== this.renderId) return;
       if (!size) {
@@ -196,7 +197,7 @@ export class PassToWalletButton extends Base {
       y: rect.top,
       width: rect.width,
       height: rect.height,
-      layout: this.layout,
+      layout: this.appleLayout,
     }).catch(() => undefined);
   }
 }

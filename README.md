@@ -8,7 +8,7 @@ Add passes to Apple Wallet (PassKit) and Google Wallet (Google Pay API) from Cap
 - **Official buttons, ready to use.** Drop `<pass-to-wallet-button>` into any page (Angular, React, Vue or plain HTML) and listen for `walletclick`:
   - **iOS**: the real `PKAddPassButton` as Apple requires in apps, drawn natively over the web view. It follows the element while the page scrolls, animates or opens a modal, and hides when something covers it.
   - **Android**: Google's official "Add to / View in Google Wallet" artwork in 70+ languages, matched to your page or device language. Only the language in use is downloaded.
-- **Sized your way, never distorted.** Pick the one-line or two-line Apple button, set a width and height, and the button scales as a whole with Apple's proportions kept.
+- **Sized your way, never distorted.** Pick the one-line (`button`) or two-line (`badge`) Apple button, set a width and height, and the button scales as a whole with Apple's proportions kept.
 - **A "View in Wallet" button too.** Apple has no official control for passes already added; the plugin gives you one you can restyle with CSS and your own label.
 - **A predictable add flow.** `addPass` resolves only after the add sheet closes, and `passExists` tells you whether the pass actually landed in Wallet, so your app (or server) never records a pass the user cancelled.
 - **Your backend stays yours.** The plugin never signs or stores passes: issue the `.pkpass` (Apple) or the save JWT (Google) from any server you like.
@@ -55,14 +55,13 @@ import '@ordernow/capacitor-pass-to-wallet'; // registers <pass-to-wallet-button
 | Attribute | Values | Default |
 | --- | --- | --- |
 | `mode` | `add` · `view` (already added) | `add` |
-| `variant` | `button` · `badge` (Google artwork style) | `button` |
-| `layout` | `one-line` · `two-line` (iOS add button) | `one-line` |
+| `variant` | `button` (iOS one-line, Google button) · `badge` (iOS two-line, Google badge) | `button` |
 
 - **iOS**: `mode="add"` is the official `PKAddPassButton`, drawn natively over the element and kept in place while the page scrolls or animates (hidden when anything covers it). `mode="view"` is yours to design (see below): Apple has no official control and only suggests a link labelled like "View in Wallet".
 - **Android**: Google's official "Add to / View in Google Wallet" artwork in the page language: the nearest `lang` attribute (on the element or `<html>`, so apps with their own language setting just keep `<html lang>` current), then the device language (`navigator.languages`), then English. Only the chosen language is downloaded.
 - iOS draws `PKAddPassButton` in the app's iOS language (device or per-app language in iOS Settings, limited to `CFBundleLocalizations`); Apple offers no way to set it from the web page.
 - **Web**: renders nothing.
-- Size: CSS `--pass-to-wallet-height` (Google default `48px`; width follows the artwork). The iOS add button defaults to iOS's own size for its `layout`; set `--pass-to-wallet-height` (width follows iOS's ratio) and/or `--pass-to-wallet-width` to change it: the button scales as a whole to fit (Apple's proportions kept) and its background fills the box.
+- Size: CSS `--pass-to-wallet-height` (Google default `48px`; width follows the artwork). The iOS add button defaults to iOS's own size for its `variant`; set `--pass-to-wallet-height` (width follows iOS's ratio) and/or `--pass-to-wallet-width` to change it: the button scales as a whole to fit (Apple's proportions kept) and its background fills the box.
 
 ### Customizing the Apple "view" button
 
