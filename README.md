@@ -44,12 +44,13 @@ import '@ordernow/capacitor-pass-to-wallet'; // registers <pass-to-wallet-button
 | --- | --- | --- |
 | `mode` | `add` · `view` (already added) | `add` |
 | `variant` | `button` · `badge` (Google artwork style) | `button` |
+| `layout` | `one-line` · `two-line` (iOS add button) | `one-line` |
 
 - **iOS**: `mode="add"` is the official `PKAddPassButton`, drawn natively over the element and kept in place while the page scrolls or animates (hidden when anything covers it). `mode="view"` is yours to design (see below): Apple has no official control and only suggests a link labelled like "View in Wallet".
 - **Android**: Google's official "Add to / View in Google Wallet" artwork in the page language: the nearest `lang` attribute (on the element or `<html>`, so apps with their own language setting just keep `<html lang>` current), then the device language (`navigator.languages`), then English. Only the chosen language is downloaded.
 - iOS draws `PKAddPassButton` in the app's iOS language (device or per-app language in iOS Settings, limited to `CFBundleLocalizations`); Apple offers no way to set it from the web page.
 - **Web**: renders nothing.
-- Height: CSS `--pass-to-wallet-height` (default `48px`); width follows the artwork. The iOS add button scales as a whole with the height (Apple's proportions kept) and is never stretched by a width.
+- Size: CSS `--pass-to-wallet-height` (Google default `48px`; width follows the artwork). The iOS add button defaults to iOS's own size for its `layout`; set `--pass-to-wallet-height` (width follows iOS's ratio) and/or `--pass-to-wallet-width` to change it: the button scales as a whole to fit (Apple's proportions kept) and its background fills the box.
 
 ### Customizing the Apple "view" button
 
@@ -89,13 +90,14 @@ Angular: add `CUSTOM_ELEMENTS_SCHEMA` to the component, then `(walletclick)="add
 * [`passExists(...)`](#passexists)
 * [`openPass(...)`](#openpass)
 * [`addPass(...)`](#addpass)
-* [`addButtonSize()`](#addbuttonsize)
+* [`addButtonSize(...)`](#addbuttonsize)
 * [`showAddButton(...)`](#showaddbutton)
 * [`hideAddButton()`](#hideaddbutton)
 * [`addListener('addButtonTap', ...)`](#addlisteneraddbuttontap-)
 * [`isAvailable()`](#isavailable)
 * [`savePassesJwt(...)`](#savepassesjwt)
 * [Interfaces](#interfaces)
+* [Type Aliases](#type-aliases)
 
 </docgen-index>
 
@@ -164,13 +166,17 @@ Resolves once the sheet is dismissed, added or cancelled: call
 --------------------
 
 
-### addButtonSize()
+### addButtonSize(...)
 
 ```typescript
-addButtonSize() => Promise<AddButtonSize>
+addButtonSize(options?: { layout?: AddButtonLayout | undefined; } | undefined) => Promise<AddButtonSize>
 ```
 
-iOS only. Intrinsic size of `PKAddPassButton`, for the web placeholder.
+iOS only. Natural size of `PKAddPassButton` in a layout (default `one-line`).
+
+| Param         | Type                                                                      |
+| ------------- | ------------------------------------------------------------------------- |
+| **`options`** | <code>{ layout?: <a href="#addbuttonlayout">AddButtonLayout</a>; }</code> |
 
 **Returns:** <code>Promise&lt;<a href="#addbuttonsize">AddButtonSize</a>&gt;</code>
 
@@ -183,8 +189,8 @@ iOS only. Intrinsic size of `PKAddPassButton`, for the web placeholder.
 showAddButton(frame: AddButtonFrame) => Promise<void>
 ```
 
-iOS only. Draws the official `PKAddPassButton` scaled to `frame.height`
-(Apple's proportions kept), centered on `frame`; taps arrive as `addButtonTap` events.
+iOS only. Draws the official `PKAddPassButton` over `frame` in `frame.layout`,
+scaled as a whole to fit (Apple's proportions kept); taps arrive as `addButtonTap` events.
 
 | Param       | Type                                                      |
 | ----------- | --------------------------------------------------------- |
@@ -278,10 +284,11 @@ Identifies a pass already in Apple Wallet.
 
 CSS px from `getBoundingClientRect()` (= points relative to the web view).
 
-| Prop    | Type                |
-| ------- | ------------------- |
-| **`x`** | <code>number</code> |
-| **`y`** | <code>number</code> |
+| Prop         | Type                                                        | Description         |
+| ------------ | ----------------------------------------------------------- | ------------------- |
+| **`x`**      | <code>number</code>                                         |                     |
+| **`y`**      | <code>number</code>                                         |                     |
+| **`layout`** | <code><a href="#addbuttonlayout">AddButtonLayout</a></code> | Default `one-line`. |
 
 
 #### PluginListenerHandle
@@ -289,6 +296,16 @@ CSS px from `getBoundingClientRect()` (= points relative to the web view).
 | Prop         | Type                                      |
 | ------------ | ----------------------------------------- |
 | **`remove`** | <code>() =&gt; Promise&lt;void&gt;</code> |
+
+
+### Type Aliases
+
+
+#### AddButtonLayout
+
+iOS shows one line whenever the button is at least as wide as that layout's natural width.
+
+<code>'one-line' | 'two-line'</code>
 
 </docgen-api>
 

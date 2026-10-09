@@ -11,10 +11,15 @@ export interface AddButtonSize {
   height: number;
 }
 
+/** iOS shows one line whenever the button is at least as wide as that layout's natural width. */
+export type AddButtonLayout = 'one-line' | 'two-line';
+
 /** CSS px from `getBoundingClientRect()` (= points relative to the web view). */
 export interface AddButtonFrame extends AddButtonSize {
   x: number;
   y: number;
+  /** Default `one-line`. */
+  layout?: AddButtonLayout;
 }
 
 export interface PassToWalletPlugin {
@@ -36,12 +41,12 @@ export interface PassToWalletPlugin {
    */
   addPass(options: { base64: string }): Promise<void>;
 
-  /** iOS only. Intrinsic size of `PKAddPassButton`, for the web placeholder. */
-  addButtonSize(): Promise<AddButtonSize>;
+  /** iOS only. Natural size of `PKAddPassButton` in a layout (default `one-line`). */
+  addButtonSize(options?: { layout?: AddButtonLayout }): Promise<AddButtonSize>;
 
   /**
-   * iOS only. Draws the official `PKAddPassButton` scaled to `frame.height`
-   * (Apple's proportions kept), centered on `frame`; taps arrive as `addButtonTap` events.
+   * iOS only. Draws the official `PKAddPassButton` over `frame` in `frame.layout`,
+   * scaled as a whole to fit (Apple's proportions kept); taps arrive as `addButtonTap` events.
    */
   showAddButton(frame: AddButtonFrame): Promise<void>;
 

@@ -86,17 +86,25 @@ public class PassToWalletPlugin: CAPPlugin, CAPBridgedPlugin, PKAddPassesViewCon
         }
     }
 
-    /// The system's localized size; the web placeholder reserves exactly this.
+    /// The system's localized size for the layout; the web placeholder defaults to it.
     @objc func addButtonSize(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
-            let size = PKAddPassButton(addPassButtonStyle: .black).intrinsicContentSize
+            let size = self.naturalSize(PKAddPassButton(addPassButtonStyle: .black), call.getString("layout"))
             call.resolve(["width": size.width, "height": size.height])
         }
     }
 
+    /// iOS shows one line whenever the bounds are at least as wide as `sizeThatFits`
+    /// (whatever the height), else two lines (`intrinsicContentSize`).
+    private func naturalSize(_ button: PKAddPassButton, _ layout: String?) -> CGSize {
+        layout == "two-line"
+            ? button.intrinsicContentSize
+            : button.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude))
+    }
+
     /// Frame is CSS px from getBoundingClientRect, which equals points relative to the web view.
-    /// The system's 40pt artwork is scaled as a whole to the frame height (icon, text, padding
-    /// and corners keep Apple's proportions) and centered; the frame width never stretches it.
+    /// The layout's natural button is scaled as a whole to fit the frame (Apple's proportions
+    /// kept) and its bounds grow to fill the rest, so the background covers the frame.
     @objc func showAddButton(_ call: CAPPluginCall) {
         let frame = CGRect(
             x: call.getDouble("x") ?? 0,
@@ -110,10 +118,16 @@ public class PassToWalletPlugin: CAPPlugin, CAPBridgedPlugin, PKAddPassesViewCon
                 return
             }
             let button = self.addButton ?? self.makeAddButton(in: webView)
-            let natural = button.intrinsicContentSize
-            let scale = frame.height / natural.height
+            let layout = call.getString("layout")
+            let natural = self.naturalSize(button, layout)
+            let scale = min(frame.width / natural.width, frame.height / natural.height)
+            var size = CGSize(width: frame.width / scale, height: frame.height / scale)
+            if layout == "two-line" {
+                // ponytail: a frame wider than the one-line width leaves side gaps; iOS would switch to one line.
+                size.width = min(size.width, self.naturalSize(button, "one-line").width - 1)
+            }
             button.transform = .identity
-            button.bounds = CGRect(origin: .zero, size: natural)
+            button.bounds = CGRect(origin: .zero, size: size)
             button.transform = CGAffineTransform(scaleX: scale, y: scale)
             button.center = CGPoint(x: frame.midX, y: frame.midY)
             // Re-render text at the scaled resolution instead of stretching a bitmap.

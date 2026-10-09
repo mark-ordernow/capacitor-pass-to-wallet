@@ -1,6 +1,6 @@
 {
   "name": "@ordernow/capacitor-pass-to-wallet",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "Add passes to Apple Wallet (PassKit) and Google Wallet (Google Pay API) from Capacitor apps",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",

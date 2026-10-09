@@ -1,6 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 
-import type { AddButtonSize } from './definitions.js';
+import type { AddButtonLayout, AddButtonSize } from './definitions.js';
 import { GOOGLE_BADGES } from './generated/google-badges.js';
 import { PassToWallet } from './plugin.js';
 
@@ -12,7 +12,8 @@ const STYLE = `<style>
   :host([hidden]) { display: none; }
   button { all: unset; cursor: pointer; display: block; }
   button:focus-visible { outline: 2px solid; outline-offset: 2px; }
-  img, .apple-add { display: block; height: var(--pass-to-wallet-height, 48px); }
+  img { display: block; height: var(--pass-to-wallet-height, 48px); }
+  .apple-add { display: block; }
   /* Apple has no official "view" control; the HIG suggests a link labelled
      like "View in Wallet". Restyle with ::part(button) or the variables. */
   .apple-view {
@@ -39,13 +40,13 @@ export function googleBadgeKey(keys: readonly string[], languages: readonly stri
 // There is one native PKAddPassButton: the element that last placed it gets its taps.
 let appleOwner: PassToWalletButton | null = null;
 let appleTapListening = false;
-let appleSize: Promise<AddButtonSize> | null = null;
+const appleSizes: Partial<Record<AddButtonLayout, Promise<AddButtonSize>>> = {};
 
 // Lets the module load where HTMLElement does not exist (SSR, unit tests).
 const Base = (typeof HTMLElement === 'undefined' ? class {} : HTMLElement) as typeof HTMLElement;
 
 /**
- * `<pass-to-wallet-button mode="add|view" variant="button|badge">`
+ * `<pass-to-wallet-button mode="add|view" variant="button|badge" layout="one-line|two-line">`
  *
  * iOS: the official PKAddPassButton drawn natively over this element (Apple
  * requires it in apps); `mode="view"` renders a link-style button with the
@@ -56,7 +57,7 @@ const Base = (typeof HTMLElement === 'undefined' ? class {} : HTMLElement) as ty
  * Taps fire a `walletclick` event; issuing and saving the pass stays with the app.
  */
 export class PassToWalletButton extends Base {
-  static observedAttributes = ['mode', 'variant'];
+  static observedAttributes = ['mode', 'variant', 'layout'];
 
   private readonly root = this.attachShadow({ mode: 'open' });
   private renderId = 0;
@@ -69,6 +70,11 @@ export class PassToWalletButton extends Base {
 
   get variant(): PassToWalletButtonVariant {
     return this.getAttribute('variant') === 'badge' ? 'badge' : 'button';
+  }
+
+  /** iOS add button only. */
+  get layout(): AddButtonLayout {
+    return this.getAttribute('layout') === 'two-line' ? 'two-line' : 'one-line';
   }
 
   connectedCallback(): void {
@@ -102,16 +108,18 @@ export class PassToWalletButton extends Base {
     this.stopTracking();
     const platform = Capacitor.getPlatform();
     if (platform === 'ios' && this.mode === 'add') {
-      const size = await (appleSize ??= PassToWallet.addButtonSize()).catch(() => null);
+      const layout = this.layout;
+      const size = await (appleSizes[layout] ??= PassToWallet.addButtonSize({ layout })).catch(() => null);
       if (id !== this.renderId) return;
       if (!size) {
         this.root.innerHTML = '';
         return;
       }
-      // Width follows the native button's localized proportions; the native
-      // button itself is what VoiceOver and taps reach.
+      // iOS's own localized size unless the app sets one (a height alone keeps
+      // iOS's ratio); the native button itself is what VoiceOver and taps reach.
       this.root.innerHTML = `${STYLE}<div part="button" class="apple-add"
-        style="width: calc(var(--pass-to-wallet-height, 48px) * ${size.width / size.height})"></div>`;
+        style="height: var(--pass-to-wallet-height, ${size.height}px);
+          width: var(--pass-to-wallet-width, calc(var(--pass-to-wallet-height, ${size.height}px) * ${size.width / size.height}))"></div>`;
       if (!appleTapListening) {
         appleTapListening = true;
         void PassToWallet.addListener('addButtonTap', () => appleOwner?.emit());
@@ -183,9 +191,13 @@ export class PassToWalletButton extends Base {
     if (appleOwner === this && frame === this.shownFrame) return;
     appleOwner = this;
     this.shownFrame = frame;
-    PassToWallet.showAddButton({ x: rect.left, y: rect.top, width: rect.width, height: rect.height }).catch(
-      () => undefined,
-    );
+    PassToWallet.showAddButton({
+      x: rect.left,
+      y: rect.top,
+      width: rect.width,
+      height: rect.height,
+      layout: this.layout,
+    }).catch(() => undefined);
   }
 }
 
