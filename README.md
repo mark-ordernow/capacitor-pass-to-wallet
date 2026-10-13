@@ -256,16 +256,19 @@ Android only. `PayClient.getPayApiAvailabilityStatus(SAVE_PASSES)`;
 ### savePassesJwt(...)
 
 ```typescript
-savePassesJwt(options: { jwt: string; }) => Promise<void>
+savePassesJwt(options: { jwt: string; }) => Promise<{ saved: boolean; }>
 ```
 
 Android only. `PayClient.savePassesJwt` with a signed save JWT.
-Resolves when the save screen returns (saved or cancelled); rejects with
-code `SAVE_ERROR` on `SavePassesResult.SAVE_ERROR`.
+Resolves when the save screen returns: `saved` is true when the user saved
+the pass, false when they cancelled. Rejects with code `SAVE_ERROR` on
+`SavePassesResult.SAVE_ERROR`.
 
 | Param         | Type                          |
 | ------------- | ----------------------------- |
 | **`options`** | <code>{ jwt: string; }</code> |
+
+**Returns:** <code>Promise&lt;{ saved: boolean; }&gt;</code>
 
 --------------------
 

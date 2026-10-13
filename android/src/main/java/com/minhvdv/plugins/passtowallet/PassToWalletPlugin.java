@@ -31,7 +31,7 @@ public class PassToWalletPlugin extends Plugin {
             .addOnFailureListener((error) -> resolveAvailable(call, false));
     }
 
-    /** Resolves on RESULT_OK or RESULT_CANCELED; the app confirms with its backend either way. */
+    /** Resolves `{ saved }`: true on RESULT_OK, false on RESULT_CANCELED. */
     @PluginMethod
     public void savePassesJwt(PluginCall call) {
         String jwt = call.getString("jwt");
@@ -56,7 +56,11 @@ public class PassToWalletPlugin extends Plugin {
         PluginCall call = pendingSave;
         pendingSave = null;
         if (resultCode == Activity.RESULT_OK || resultCode == Activity.RESULT_CANCELED) {
-            call.resolve();
+            // Google Wallet has no API to read saved passes: this result is the
+            // only on-device signal that the pass was saved.
+            JSObject result = new JSObject();
+            result.put("saved", resultCode == Activity.RESULT_OK);
+            call.resolve(result);
             return;
         }
         String message = data == null ? null : data.getStringExtra(PayClient.EXTRA_API_ERROR_MESSAGE);
