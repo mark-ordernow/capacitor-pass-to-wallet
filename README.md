@@ -107,6 +107,7 @@ Angular: add `CUSTOM_ELEMENTS_SCHEMA` to the component, then `(walletclick)="add
 * [`addListener('addButtonTap', ...)`](#addlisteneraddbuttontap-)
 * [`isAvailable()`](#isavailable)
 * [`savePassesJwt(...)`](#savepassesjwt)
+* [`openGooglePass(...)`](#opengooglepass)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 
@@ -269,6 +270,23 @@ the pass, false when they cancelled. Rejects with code `SAVE_ERROR` on
 | **`options`** | <code>{ jwt: string; }</code> |
 
 **Returns:** <code>Promise&lt;{ saved: boolean; }&gt;</code>
+
+--------------------
+
+
+### openGooglePass(...)
+
+```typescript
+openGooglePass(options: { url: string; }) => Promise<void>
+```
+
+Android only. Opens a saved pass link
+(`https://pay.google.com/gp/v/object/{issuerId}.{objectId}`) in Google
+Wallet, falling back to the browser when Google Play services is missing.
+
+| Param         | Type                          |
+| ------------- | ----------------------------- |
+| **`options`** | <code>{ url: string; }</code> |
 
 --------------------
 

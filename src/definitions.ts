@@ -71,4 +71,11 @@ export interface PassToWalletPlugin {
    * `SavePassesResult.SAVE_ERROR`.
    */
   savePassesJwt(options: { jwt: string }): Promise<{ saved: boolean }>;
+
+  /**
+   * Android only. Opens a saved pass link
+   * (`https://pay.google.com/gp/v/object/{issuerId}.{objectId}`) in Google
+   * Wallet, falling back to the browser when Google Play services is missing.
+   */
+  openGooglePass(options: { url: string }): Promise<void>;
 }

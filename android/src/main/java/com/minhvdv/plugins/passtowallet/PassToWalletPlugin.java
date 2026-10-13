@@ -1,7 +1,9 @@
 package com.minhvdv.plugins.passtowallet;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.net.Uri;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
@@ -46,6 +48,31 @@ public class PassToWalletPlugin extends Plugin {
         pendingSave = call;
         Activity activity = getActivity();
         activity.runOnUiThread(() -> Pay.getClient(activity).savePassesJwt(jwt, activity, SAVE_PASSES_REQUEST_CODE));
+    }
+
+    /**
+     * Opens a saved pass link in Google Wallet. Google Play services hosts the
+     * Wallet deep link; an implicit intent lets the browser compete for it.
+     */
+    @PluginMethod
+    public void openGooglePass(PluginCall call) {
+        String url = call.getString("url");
+        if (url == null || url.isEmpty()) {
+            call.reject("url is required");
+            return;
+        }
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addCategory(Intent.CATEGORY_BROWSABLE);
+        try {
+            getActivity().startActivity(intent.setPackage("com.google.android.gms"));
+        } catch (ActivityNotFoundException withoutWallet) {
+            try {
+                getActivity().startActivity(intent.setPackage(null));
+            } catch (ActivityNotFoundException noHandler) {
+                call.reject("Unable to open pass");
+                return;
+            }
+        }
+        call.resolve();
     }
 
     @Override
