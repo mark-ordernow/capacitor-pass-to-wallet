@@ -75,6 +75,23 @@ public class PassToWalletPlugin extends Plugin {
         call.resolve();
     }
 
+    /**
+     * Opens the Google Wallet app's home screen, or wallet.google.com when the
+     * app is missing. For passes whose object link does not load.
+     */
+    @PluginMethod
+    public void openGoogleWallet(PluginCall call) {
+        Activity activity = getActivity();
+        Intent launch = activity.getPackageManager().getLaunchIntentForPackage("com.google.android.apps.walletnfcrel");
+        try {
+            activity.startActivity(launch != null ? launch : new Intent(Intent.ACTION_VIEW, Uri.parse("https://wallet.google.com/")));
+        } catch (ActivityNotFoundException noHandler) {
+            call.reject("Unable to open Google Wallet");
+            return;
+        }
+        call.resolve();
+    }
+
     @Override
     @SuppressWarnings("deprecation")
     protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {

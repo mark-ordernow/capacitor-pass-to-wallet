@@ -108,6 +108,7 @@ Angular: add `CUSTOM_ELEMENTS_SCHEMA` to the component, then `(walletclick)="add
 * [`isAvailable()`](#isavailable)
 * [`savePassesJwt(...)`](#savepassesjwt)
 * [`openGooglePass(...)`](#opengooglepass)
+* [`openGoogleWallet()`](#opengooglewallet)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 
@@ -287,6 +288,18 @@ Wallet, falling back to the browser when Google Play services is missing.
 | Param         | Type                          |
 | ------------- | ----------------------------- |
 | **`options`** | <code>{ url: string; }</code> |
+
+--------------------
+
+
+### openGoogleWallet()
+
+```typescript
+openGoogleWallet() => Promise<void>
+```
+
+Android only. Opens the Google Wallet app (wallet.google.com when it is
+not installed), for passes without a working object link.
 
 --------------------
 

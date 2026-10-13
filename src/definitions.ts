@@ -78,4 +78,10 @@ export interface PassToWalletPlugin {
    * Wallet, falling back to the browser when Google Play services is missing.
    */
   openGooglePass(options: { url: string }): Promise<void>;
+
+  /**
+   * Android only. Opens the Google Wallet app (wallet.google.com when it is
+   * not installed), for passes without a working object link.
+   */
+  openGoogleWallet(): Promise<void>;
 }
